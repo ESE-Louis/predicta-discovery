@@ -264,7 +264,7 @@ export default function Discovery() {
           <span style={{ color: "#4a9eff", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>Predicta.au · Louis Nonis</span>
         </div>
         <h1 style={{ fontSize: "clamp(34px,5vw,54px)", fontWeight: 400, color: "#f1f5f9", lineHeight: 1.12, marginBottom: 18, letterSpacing: "-0.02em" }}>
-          Where is AI hiding<br /><span style={{ color: "#4a9eff", fontStyle: "italic" }}>revenue in your business?</span>
+          Discover where AI can<br /><span style={{ color: "#4a9eff", fontStyle: "italic" }}>unlock new revenue.</span>
         </h1>
         <p style={{ color: "#64748b", fontSize: 15, lineHeight: 1.75, marginBottom: 28, fontFamily: "Helvetica Neue, sans-serif" }}>
           Most AI conversations are about cutting costs. This one is different.<br /><br />

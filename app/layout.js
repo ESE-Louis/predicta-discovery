@@ -5,7 +5,7 @@ export const metadata = {
   description:
     "Discover where AI can generate new revenue in your business. 12 adaptive questions. One personalised opportunity map.",
   openGraph: {
-    title: "Where is AI hiding revenue in your business?",
+    title: "Discover where AI can unlock new revenue.",
     description:
       "Answer 12 questions and get a personalised AI revenue opportunity map — specific to your situation.",
     url: "https://predicta.au",
