@@ -259,9 +259,8 @@ export default function Discovery() {
       <BG />
       <div style={{ position: "absolute", top: "15%", right: "8%", width: 480, height: 480, background: "radial-gradient(circle, rgba(74,158,255,0.06) 0%, transparent 70%)", borderRadius: "50%", pointerEvents: "none" }} />
       <div style={{ maxWidth: 560, width: "100%", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <div style={{ width: 28, height: 2, background: "#4a9eff" }} />
-          <span style={{ color: "#4a9eff", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>Predicta.au · Louis Nonis</span>
+        <div style={{ marginBottom: 24 }}>
+          <img src="/predicta-logo.svg" alt="Predicta" style={{ height: 48, width: "auto" }} />
         </div>
         <h1 style={{ fontSize: "clamp(34px,5vw,54px)", fontWeight: 400, color: "#f1f5f9", lineHeight: 1.12, marginBottom: 18, letterSpacing: "-0.02em" }}>
           Discover where AI can<br /><span style={{ color: "#4a9eff", fontStyle: "italic" }}>unlock new revenue.</span>
