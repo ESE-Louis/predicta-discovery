@@ -266,23 +266,23 @@ export default function Discovery() {
         <h1 style={{ fontSize: "clamp(34px,5vw,54px)", fontWeight: 400, color: "#f1f5f9", lineHeight: 1.12, marginBottom: 18, letterSpacing: "-0.02em" }}>
           Discover where AI can<br /><span style={{ color: "#4a9eff", fontStyle: "italic" }}>unlock new revenue.</span>
         </h1>
-        <p style={{ color: "#64748b", fontSize: 15, lineHeight: 1.75, marginBottom: 28, fontFamily: "Helvetica Neue, sans-serif" }}>
+        <p style={{ color: "#f1f5f9", fontSize: 15, lineHeight: 1.75, marginBottom: 28, fontFamily: "Helvetica Neue, sans-serif" }}>
           Most AI conversations are about cutting costs. This one is different.<br /><br />
-          Answer 12 questions and get a personalised map of where AI can <em style={{ color: "#94a3b8" }}>generate new revenue</em> — specific to your situation, not a generic playbook.
+          Answer 12 questions and get a personalised map of where AI can <em style={{ color: "#4a9eff" }}>generate new revenue</em> — specific to your situation, not a generic playbook.
         </p>
         <div style={{ display: "flex", gap: 10, marginBottom: 28 }}>
           {MOVES.map(m => (
             <div key={m.id} style={{ flex: 1, background: "#0a1628", border: `1px solid ${m.accent}20`, borderRadius: 10, padding: "14px 10px", textAlign: "center" }}>
               <div style={{ fontSize: 11, color: m.accent, fontFamily: "monospace", marginBottom: 6 }}>{m.number}</div>
-              <div style={{ fontSize: 10, color: "#475569", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "Helvetica Neue, sans-serif", lineHeight: 1.3 }}>{m.label}</div>
+              <div style={{ fontSize: 10, color: "#f1f5f9", textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "Helvetica Neue, sans-serif", lineHeight: 1.3 }}>{m.label}</div>
             </div>
           ))}
         </div>
         <div style={{ background: "#0a1628", border: "1px solid #1e293b", borderRadius: 10, padding: "14px 18px", marginBottom: 28, display: "flex", gap: 12 }}>
           <div style={{ color: "#10b981", fontSize: 16, flexShrink: 0, marginTop: 2 }}>✦</div>
           <div>
-            <p style={{ margin: "0 0 4px 0", fontSize: 13, color: "#94a3b8", fontFamily: "Helvetica Neue, sans-serif", lineHeight: 1.5 }}>Questions adapt in real time based on what you share — nothing is scripted or assumed.</p>
-            <p style={{ margin: 0, fontSize: 12, color: "#334155", fontFamily: "Helvetica Neue, sans-serif" }}>Takes ~15 minutes · Your map is emailed to you at the end</p>
+            <p style={{ margin: "0 0 4px 0", fontSize: 13, color: "#f1f5f9", fontFamily: "Helvetica Neue, sans-serif", lineHeight: 1.5 }}>Questions adapt in real time based on what you share — nothing is scripted or assumed.</p>
+            <p style={{ margin: 0, fontSize: 12, color: "#cbd5e1", fontFamily: "Helvetica Neue, sans-serif" }}>Takes ~15 minutes · Your map is emailed to you at the end</p>
           </div>
         </div>
         <button
