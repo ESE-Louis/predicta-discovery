@@ -447,7 +447,7 @@ export default function Discovery() {
             <p style={{ color: "#64748b", fontSize: 14, lineHeight: 1.65, marginBottom: 22, maxWidth: 460, margin: "0 auto 22px", fontFamily: "Helvetica Neue, sans-serif" }}>
               A focused 90-minute session with Louis to map your top opportunities in detail, build the business case, and identify your first 30-day implementation play.
             </p>
-            <a href="https://predicta.au" style={{ display: "inline-block", background: "#4a9eff", borderRadius: 8, padding: "14px 32px", color: "#050d1a", fontSize: 14, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>
+            <a href="https://calendly.com/louis-2/ai-revenue-diagnostic-session" style={{ display: "inline-block", background: "#4a9eff", borderRadius: 8, padding: "14px 32px", color: "#050d1a", fontSize: 14, fontWeight: 700, textDecoration: "none", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>
               Book a Session with Louis →
             </a>
           </div>
