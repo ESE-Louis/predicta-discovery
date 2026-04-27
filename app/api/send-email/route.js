@@ -156,7 +156,7 @@ function buildEmailHTML(name, company, results) {
           <p style="margin:0 0 10px;font-size:22px;color:#f1f5f9;font-family:Georgia,serif;font-weight:400;">AI Revenue Diagnostic Session</p>
           <p style="margin:0 0 22px;font-size:14px;color:#64748b;line-height:1.65;font-family:Helvetica,sans-serif;max-width:420px;display:inline-block;">A focused 90-minute session with Louis to map your top opportunities in detail, build the business case, and identify your first implementation play.</p>
           <br>
-          <a href="https://calendly.com/louis-2/ai-revenue-diagnostic-session" style="display:inline-block;background:#4a9eff;color:#050d1a;text-decoration:none;padding:14px 36px;border-radius:8px;font-size:14px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;font-family:Helvetica,sans-serif;">Book a Session with Louis →</a>
+          <a href="https://api.leadconnectorhq.com/widget/booking/JXRkn6UXi7wJN7Uv2kOM" style="display:inline-block;background:#4a9eff;color:#050d1a;text-decoration:none;padding:14px 36px;border-radius:8px;font-size:14px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;font-family:Helvetica,sans-serif;">Book a Session with Louis →</a>
         </td></tr>
       </table>
     </td></tr>
