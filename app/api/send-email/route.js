@@ -183,18 +183,42 @@ export async function POST(request) {
     }
 
     const html = buildEmailHTML(name, company, results);
+    const from = `${process.env.RESEND_FROM_NAME || "Louis Nonis"} <${process.env.RESEND_FROM_EMAIL || "hello@mail.predicta.au"}>`;
+    const subject = `Your AI Revenue Opportunity Map — ${company || name || "Predicta"}`;
 
+    // Send report to customer
     const { data, error } = await resend.emails.send({
-      from: `${process.env.RESEND_FROM_NAME || "Louis Nonis"} <${process.env.RESEND_FROM_EMAIL || "hello@predicta.au"}>`,
+      from,
       to: [email],
-      bcc: process.env.LEAD_BCC_EMAIL ? [process.env.LEAD_BCC_EMAIL] : [],
-      subject: `Your AI Revenue Opportunity Map — ${company || name || "Predicta"}`,
+      subject,
       html,
     });
 
     if (error) {
       console.error("Resend error:", error);
       return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    // Send separate lead notification directly to Louis — never suppressed
+    if (process.env.LEAD_BCC_EMAIL) {
+      const notifyHtml = `
+        <div style="font-family:Helvetica,sans-serif;background:#050d1a;color:#f1f5f9;padding:32px;border-radius:12px;max-width:520px;">
+          <p style="color:#4a9eff;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 12px;">New Lead — Predicta Discovery</p>
+          <h2 style="margin:0 0 20px;font-size:24px;font-weight:400;font-family:Georgia,serif;">New discovery completed</h2>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;color:#64748b;font-size:13px;width:100px;">Name</td><td style="padding:8px 0;color:#f1f5f9;font-size:13px;">${name || "—"}</td></tr>
+            <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Company</td><td style="padding:8px 0;color:#f1f5f9;font-size:13px;">${company || "—"}</td></tr>
+            <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Email</td><td style="padding:8px 0;font-size:13px;"><a href="mailto:${email}" style="color:#4a9eff;">${email}</a></td></tr>
+          </table>
+          <p style="margin:20px 0 0;font-size:12px;color:#334155;">Their full report has been sent to their inbox. <a href="https://resend.com/emails" style="color:#4a9eff;">View in Resend →</a></p>
+        </div>`;
+
+      await resend.emails.send({
+        from,
+        to: [process.env.LEAD_BCC_EMAIL],
+        subject: `🔔 New lead: ${name || "Someone"}${company ? ` · ${company}` : ""} just completed a discovery`,
+        html: notifyHtml,
+      }).catch(e => console.error("Lead notify error:", e)); // Never block customer send
     }
 
     return Response.json({ success: true, id: data?.id });
