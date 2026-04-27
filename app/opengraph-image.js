@@ -10,56 +10,31 @@ export default function Image() {
     (
       <div
         style={{
-          width: "100%",
-          height: "100%",
+          width: "1200px",
+          height: "630px",
           background: "#050d1a",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          fontFamily: "sans-serif",
-          position: "relative",
         }}
       >
-        {/* Grid background */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(74,158,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(74,158,255,0.04) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
-
-        {/* Glow */}
-        <div
-          style={{
-            position: "absolute",
-            top: "-100px",
-            right: "-100px",
-            width: "600px",
-            height: "600px",
-            background: "radial-gradient(circle, rgba(74,158,255,0.08) 0%, transparent 70%)",
-            borderRadius: "50%",
-          }}
-        />
-
-        {/* Brand */}
+        {/* Brand label */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            marginBottom: "48px",
+            marginBottom: "40px",
           }}
         >
           <div
             style={{
-              fontSize: "18px",
+              fontSize: "16px",
               color: "#4a9eff",
-              letterSpacing: "0.2em",
+              letterSpacing: "4px",
               textTransform: "uppercase",
               fontWeight: 700,
+              fontFamily: "sans-serif",
             }}
           >
             PREDICTA
@@ -67,39 +42,50 @@ export default function Image() {
           <div
             style={{
               width: "1px",
-              height: "18px",
+              height: "16px",
               background: "#1e293b",
               margin: "0 16px",
             }}
           />
           <div
             style={{
-              fontSize: "14px",
+              fontSize: "13px",
               color: "#475569",
-              letterSpacing: "0.1em",
+              letterSpacing: "3px",
               textTransform: "uppercase",
+              fontFamily: "sans-serif",
             }}
           >
             AI Revenue Generation
           </div>
         </div>
 
-        {/* Headline */}
+        {/* Main headline */}
         <div
           style={{
-            fontSize: "64px",
+            fontSize: "62px",
             fontWeight: 400,
             color: "#f1f5f9",
             lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-            marginBottom: "24px",
-            maxWidth: "800px",
+            marginBottom: "12px",
+            fontFamily: "sans-serif",
+            maxWidth: "900px",
           }}
         >
-          Discover where AI can{" "}
-          <span style={{ color: "#4a9eff", fontStyle: "italic" }}>
-            unlock new revenue.
-          </span>
+          Discover where AI can
+        </div>
+        <div
+          style={{
+            fontSize: "62px",
+            fontWeight: 400,
+            color: "#4a9eff",
+            lineHeight: 1.1,
+            marginBottom: "32px",
+            fontFamily: "sans-serif",
+            fontStyle: "italic",
+          }}
+        >
+          unlock new revenue.
         </div>
 
         {/* Subheadline */}
@@ -109,41 +95,48 @@ export default function Image() {
             color: "#64748b",
             lineHeight: 1.5,
             marginBottom: "48px",
-            maxWidth: "680px",
+            fontFamily: "sans-serif",
+            maxWidth: "700px",
           }}
         >
-          12 adaptive questions. One personalised AI Revenue Opportunity Map.
-          Free, in under 15 minutes.
+          12 adaptive questions. One personalised AI Revenue Opportunity Map. Free, in under 15 minutes.
         </div>
 
-        {/* CTA pill */}
+        {/* Bottom row */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
+            gap: "24px",
           }}
         >
           <div
             style={{
               background: "#4a9eff",
               color: "#050d1a",
-              fontSize: "16px",
+              fontSize: "15px",
               fontWeight: 700,
-              letterSpacing: "0.08em",
+              letterSpacing: "2px",
               textTransform: "uppercase",
               padding: "14px 28px",
               borderRadius: "8px",
+              fontFamily: "sans-serif",
             }}
           >
             Start Free Discovery →
           </div>
-          <div style={{ fontSize: "16px", color: "#334155" }}>
+          <div
+            style={{
+              fontSize: "16px",
+              color: "#334155",
+              fontFamily: "sans-serif",
+            }}
+          >
             discoverai.predicta.au
           </div>
         </div>
       </div>
     ),
-    { ...size }
+    { width: 1200, height: 630 }
   );
 }
