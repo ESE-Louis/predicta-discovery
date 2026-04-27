@@ -68,11 +68,11 @@ async function fetchDynamicQuestion(questionKey, priorQA, businessContext) {
   return data.question;
 }
 
-async function fetchResults(answers, resolvedQuestions, name, company, industry, businessDescription) {
+async function fetchResults(answers, resolvedQuestions, name, company, industry, businessDescription, websiteContent) {
   const res = await fetch("/api/generate-results", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ answers, resolvedQuestions, name, company, industry, businessDescription }),
+    body: JSON.stringify({ answers, resolvedQuestions, name, company, industry, businessDescription, websiteContent }),
   });
   if (!res.ok) throw new Error(`Results API error ${res.status}`);
   return res.json();
@@ -155,6 +155,9 @@ export default function Discovery() {
   const [resolvedTexts, setResolvedTexts] = useState({});
   const [industry, setIndustry] = useState("");
   const [businessDescription, setBusinessDescription] = useState("");
+  const [website, setWebsite] = useState("");
+  const [websiteContent, setWebsiteContent] = useState("");
+  const [fetchingWebsite, setFetchingWebsite] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState(null);
@@ -194,7 +197,13 @@ export default function Discovery() {
     }
     setGeneratingQuestion(true); setQuestionReady(false); setShowHint(false);
     const priorQA = allQFlat.filter(q => answers[q.id]).map(q => `Q: ${q.resolvedText || q.text}\nA: ${answers[q.id]}`).join("\n\n");
-    const businessContext = `Name: ${name || "Unknown"}\nCompany: ${company || "Unknown"}\nIndustry: ${industry || "Unknown"}\nWhat they do: ${businessDescription || "Unknown"}`;
+    const businessContext = [
+      `Name: ${name || "Unknown"}`,
+      `Company: ${company || "Unknown"}`,
+      `Industry: ${industry || "Unknown"}`,
+      `What they do: ${businessDescription || "Unknown"}`,
+      websiteContent ? `Website content (homepage): ${websiteContent.slice(0, 2000)}` : null,
+    ].filter(Boolean).join("\n");
     fetchDynamicQuestion(currentQuestion.id, priorQA, businessContext)
       .then(text => {
         setResolvedTexts(prev => ({ ...prev, [currentQuestion.id]: text || FALLBACK_QUESTIONS[currentQuestion.id] }));
@@ -226,8 +235,27 @@ export default function Discovery() {
     }, 400);
   }
 
-  function handlePrescreen() {
+  async function handlePrescreen() {
     if (!name.trim() || !industry.trim() || !businessDescription.trim()) return;
+
+    // If website entered, fetch content first — fail gracefully if it errors
+    if (website.trim()) {
+      setFetchingWebsite(true);
+      try {
+        const res = await fetch("/api/fetch-website", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: website.trim() }),
+        });
+        const data = await res.json();
+        if (data.content) setWebsiteContent(data.content);
+      } catch {
+        // Silently continue without website content
+      } finally {
+        setFetchingWebsite(false);
+      }
+    }
+
     setPhase("discovery");
   }
 
@@ -235,7 +263,7 @@ export default function Discovery() {
     if (!email.trim()) return;
     setPhase("loading");
     const flatResolved = MOVES.flatMap(m => m.questions).map(q => ({ ...q, resolvedText: resolvedTexts[q.id] || q.text }));
-    fetchResults(answers, flatResolved, name, company, industry, businessDescription)
+    fetchResults(answers, flatResolved, name, company, industry, businessDescription, websiteContent)
       .then(r => { setAiResults(r); setPhase("results"); })
       .catch(e => { setAiError(e.message); setPhase("results"); });
   }
@@ -259,6 +287,7 @@ export default function Discovery() {
     setResolvedTexts({}); setGeneratingQuestion(false);
     setName(""); setCompany(""); setEmail("");
     setIndustry(""); setBusinessDescription("");
+    setWebsite(""); setWebsiteContent(""); setFetchingWebsite(false);
     setEmailSent(false); setEmailError(null);
   }
 
@@ -335,9 +364,16 @@ export default function Discovery() {
               <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>What does your business do? *</label>
               <textarea value={businessDescription} onChange={e => setBusinessDescription(e.target.value)} placeholder="e.g. We provide HR software to mid-size companies in Australia, helping them manage payroll and compliance. Our main customers are businesses with 50–500 employees..." rows={3} style={{ width: "100%", background: "#050d1a", border: `1px solid ${businessDescription.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box", resize: "vertical", lineHeight: 1.6 }} />
             </div>
+            <div>
+              <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                Company website <span style={{ color: "#334155", textTransform: "none", letterSpacing: 0 }}>(optional — helps AI personalise your results)</span>
+              </label>
+              <input value={website} onChange={e => setWebsite(e.target.value)} placeholder="e.g. predicta.au or https://predicta.au" style={{ width: "100%", background: "#050d1a", border: `1px solid ${website.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box" }} />
+              {website.trim() && <p style={{ margin: "6px 0 0", fontSize: 11, color: "#334155", fontFamily: "Helvetica Neue, sans-serif" }}>✦ We'll read your homepage to tailor every question to your business</p>}
+            </div>
           </div>
-          <button onClick={handlePrescreen} disabled={!name.trim() || !industry.trim() || !businessDescription.trim()} style={{ width: "100%", padding: "15px 24px", background: name.trim() && industry.trim() && businessDescription.trim() ? "#4a9eff" : "#0f1f35", border: `1px solid ${name.trim() && industry.trim() && businessDescription.trim() ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: name.trim() && industry.trim() && businessDescription.trim() ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: name.trim() && industry.trim() && businessDescription.trim() ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>
-            Start My Discovery →
+          <button onClick={handlePrescreen} disabled={!name.trim() || !industry.trim() || !businessDescription.trim() || fetchingWebsite} style={{ width: "100%", padding: "15px 24px", background: name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "#4a9eff" : "#0f1f35", border: `1px solid ${name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+            {fetchingWebsite ? <><Spinner accent="#334155" size={16} /> Reading your website…</> : "Start My Discovery →"}
           </button>
           <p style={{ textAlign: "center", color: "#1e293b", fontSize: 11, marginTop: 12, fontFamily: "Helvetica Neue, sans-serif" }}>Fields marked * are required</p>
         </div>

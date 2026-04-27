@@ -30,12 +30,20 @@ Return 2-4 opportunities ranked by score. Revenue generation only. Never mention
 export async function POST(request) {
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const { answers, resolvedQuestions, name, company, industry, businessDescription } = await request.json();
+    const { answers, resolvedQuestions, name, company, industry, businessDescription, websiteContent } = await request.json();
 
     const qaBlock = resolvedQuestions
       .filter((q) => answers[q.id])
       .map((q) => `Q: ${q.resolvedText || q.text}\nA: ${answers[q.id]}`)
       .join("\n\n");
+
+    const contextBlock = [
+      `Name: ${name || "Unknown"}`,
+      `Company: ${company || "Unknown"}`,
+      `Industry: ${industry || "Unknown"}`,
+      `Business: ${businessDescription || "Unknown"}`,
+      websiteContent ? `\nWebsite content (homepage extract):\n${websiteContent.slice(0, 3000)}` : null,
+    ].filter(Boolean).join("\n");
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-20250514",
@@ -44,7 +52,7 @@ export async function POST(request) {
       messages: [
         {
           role: "user",
-          content: `Name: ${name || "Unknown"}\nCompany: ${company || "Unknown"}\nIndustry: ${industry || "Unknown"}\nBusiness: ${businessDescription || "Unknown"}\n\n${qaBlock}`,
+          content: `${contextBlock}\n\n${qaBlock}`,
         },
       ],
     });
