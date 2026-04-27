@@ -377,6 +377,17 @@ export default function Discovery() {
           </button>
           <p style={{ textAlign: "center", color: "#1e293b", fontSize: 11, marginTop: 12, fontFamily: "Helvetica Neue, sans-serif" }}>Fields marked * are required</p>
         </div>
+        <div style={{ marginTop: 20, background: "#0a1628", border: "1px solid #1e293b", borderRadius: 10, padding: "16px 20px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+          <div style={{ color: "#334155", fontSize: 16, flexShrink: 0, marginTop: 1 }}>🔒</div>
+          <div>
+            <p style={{ margin: "0 0 4px", fontSize: 12, color: "#64748b", fontFamily: "Helvetica Neue, sans-serif", lineHeight: 1.6 }}>
+              <span style={{ color: "#94a3b8", fontWeight: 600 }}>Your data is never stored.</span> Answers are processed in memory to generate your results, then discarded. Nothing is saved to a database. We recommend using directional figures rather than exact financials.
+            </p>
+            <p style={{ margin: 0, fontSize: 11, color: "#334155", fontFamily: "Helvetica Neue, sans-serif" }}>
+              Processed securely via Vercel · Anthropic · Resend — all SOC 2 certified.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
