@@ -30,7 +30,7 @@ Return 2-4 opportunities ranked by score. Revenue generation only. Never mention
 export async function POST(request) {
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const { answers, resolvedQuestions, name, company } = await request.json();
+    const { answers, resolvedQuestions, name, company, industry, businessDescription } = await request.json();
 
     const qaBlock = resolvedQuestions
       .filter((q) => answers[q.id])
@@ -44,7 +44,7 @@ export async function POST(request) {
       messages: [
         {
           role: "user",
-          content: `Name: ${name || "Unknown"}\nCompany: ${company || "Unknown"}\n\n${qaBlock}`,
+          content: `Name: ${name || "Unknown"}\nCompany: ${company || "Unknown"}\nIndustry: ${industry || "Unknown"}\nBusiness: ${businessDescription || "Unknown"}\n\n${qaBlock}`,
         },
       ],
     });

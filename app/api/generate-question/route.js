@@ -40,18 +40,23 @@ Reference their market or customer relationships. One sentence only. No preamble
 export async function POST(request) {
   try {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const { questionKey, priorQA } = await request.json();
+    const { questionKey, priorQA, businessContext } = await request.json();
 
     const systemPrompt = PROMPTS[questionKey];
     if (!systemPrompt) {
       return Response.json({ error: "Unknown question key" }, { status: 400 });
     }
 
+    const userContent = [
+      businessContext ? `Business context:\n${businessContext}` : null,
+      `Prior conversation:\n${priorQA}`,
+    ].filter(Boolean).join("\n\n");
+
     const message = await client.messages.create({
       model: "claude-sonnet-4-20250514",
       max_tokens: 120,
       system: systemPrompt,
-      messages: [{ role: "user", content: `Prior conversation:\n${priorQA}` }],
+      messages: [{ role: "user", content: userContent }],
     });
 
     const text = message.content.map((b) => b.text || "").join("").trim().replace(/^["']|["']$/g, "");

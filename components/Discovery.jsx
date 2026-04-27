@@ -57,22 +57,22 @@ const FALLBACK_QUESTIONS = {
 };
 
 // ── API CALLS (to our own server routes — key stays server-side) ─────────────
-async function fetchDynamicQuestion(questionKey, priorQA) {
+async function fetchDynamicQuestion(questionKey, priorQA, businessContext) {
   const res = await fetch("/api/generate-question", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ questionKey, priorQA }),
+    body: JSON.stringify({ questionKey, priorQA, businessContext }),
   });
   if (!res.ok) throw new Error(`Question API error ${res.status}`);
   const data = await res.json();
   return data.question;
 }
 
-async function fetchResults(answers, resolvedQuestions, name, company) {
+async function fetchResults(answers, resolvedQuestions, name, company, industry, businessDescription) {
   const res = await fetch("/api/generate-results", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ answers, resolvedQuestions, name, company }),
+    body: JSON.stringify({ answers, resolvedQuestions, name, company, industry, businessDescription }),
   });
   if (!res.ok) throw new Error(`Results API error ${res.status}`);
   return res.json();
@@ -153,6 +153,8 @@ export default function Discovery() {
   const [aiResults, setAiResults] = useState(null);
   const [aiError, setAiError] = useState(null);
   const [resolvedTexts, setResolvedTexts] = useState({});
+  const [industry, setIndustry] = useState("");
+  const [businessDescription, setBusinessDescription] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [emailError, setEmailError] = useState(null);
@@ -192,7 +194,8 @@ export default function Discovery() {
     }
     setGeneratingQuestion(true); setQuestionReady(false); setShowHint(false);
     const priorQA = allQFlat.filter(q => answers[q.id]).map(q => `Q: ${q.resolvedText || q.text}\nA: ${answers[q.id]}`).join("\n\n");
-    fetchDynamicQuestion(currentQuestion.id, priorQA)
+    const businessContext = `Name: ${name || "Unknown"}\nCompany: ${company || "Unknown"}\nIndustry: ${industry || "Unknown"}\nWhat they do: ${businessDescription || "Unknown"}`;
+    fetchDynamicQuestion(currentQuestion.id, priorQA, businessContext)
       .then(text => {
         setResolvedTexts(prev => ({ ...prev, [currentQuestion.id]: text || FALLBACK_QUESTIONS[currentQuestion.id] }));
         setGeneratingQuestion(false);
@@ -223,11 +226,16 @@ export default function Discovery() {
     }, 400);
   }
 
+  function handlePrescreen() {
+    if (!name.trim() || !industry.trim() || !businessDescription.trim()) return;
+    setPhase("discovery");
+  }
+
   function handleCapture() {
-    if (!name.trim() || !email.trim()) return;
+    if (!email.trim()) return;
     setPhase("loading");
     const flatResolved = MOVES.flatMap(m => m.questions).map(q => ({ ...q, resolvedText: resolvedTexts[q.id] || q.text }));
-    fetchResults(answers, flatResolved, name, company)
+    fetchResults(answers, flatResolved, name, company, industry, businessDescription)
       .then(r => { setAiResults(r); setPhase("results"); })
       .catch(e => { setAiError(e.message); setPhase("results"); });
   }
@@ -250,6 +258,7 @@ export default function Discovery() {
     setCurrentAnswer(""); setAiResults(null); setAiError(null);
     setResolvedTexts({}); setGeneratingQuestion(false);
     setName(""); setCompany(""); setEmail("");
+    setIndustry(""); setBusinessDescription("");
     setEmailSent(false); setEmailError(null);
   }
 
@@ -285,12 +294,53 @@ export default function Discovery() {
           </div>
         </div>
         <button
-          onClick={() => setPhase("discovery")}
+          onClick={() => setPhase("prescreen")}
           style={{ width: "100%", padding: "17px 24px", background: "#4a9eff", border: "none", borderRadius: 8, color: "#050d1a", fontSize: 15, fontWeight: 700, cursor: "pointer", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}
         >
           Discover My Revenue Opportunities →
         </button>
         <p style={{ textAlign: "center", color: "#1e293b", fontSize: 12, marginTop: 14, fontFamily: "Helvetica Neue, sans-serif" }}>Free · No credit card · Results emailed to you</p>
+      </div>
+    </div>
+  );
+
+  // ── PRE-SCREEN ─────────────────────────────────────────────────────────────
+  if (phase === "prescreen") return (
+    <div style={{ minHeight: "100vh", background: "#050d1a", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Georgia, serif", padding: 24, position: "relative", overflow: "hidden" }}>
+      <BG />
+      <div style={{ maxWidth: 520, width: "100%", position: "relative", zIndex: 1 }}>
+        <div style={{ marginBottom: 24 }}>
+          <img src="/predicta-logo.svg" alt="Predicta" style={{ height: 40, width: "auto" }} />
+        </div>
+        <div style={{ fontSize: 11, color: "#4a9eff", letterSpacing: "0.15em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif", marginBottom: 10 }}>Before we begin</div>
+        <h2 style={{ fontSize: "clamp(22px,4vw,34px)", color: "#f1f5f9", fontWeight: 400, letterSpacing: "-0.02em", marginBottom: 10 }}>Tell us about your business</h2>
+        <p style={{ color: "#64748b", fontSize: 14, lineHeight: 1.7, fontFamily: "Helvetica Neue, sans-serif", marginBottom: 28 }}>
+          This helps the AI tailor every question to your specific situation — not a generic playbook.
+        </p>
+        <div style={{ background: "#0a1628", border: "1px solid #1e293b", borderRadius: 12, padding: 28 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
+            <div>
+              <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>Your name *</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Sarah Johnson" style={{ width: "100%", background: "#050d1a", border: `1px solid ${name.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box" }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>Business name</label>
+              <input value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. Acme Corp" style={{ width: "100%", background: "#050d1a", border: "1px solid #1e293b", borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box" }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>Industry *</label>
+              <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="e.g. Professional Services, SaaS, Retail, Consulting, Finance..." style={{ width: "100%", background: "#050d1a", border: `1px solid ${industry.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box" }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>What does your business do? *</label>
+              <textarea value={businessDescription} onChange={e => setBusinessDescription(e.target.value)} placeholder="e.g. We provide HR software to mid-size companies in Australia, helping them manage payroll and compliance. Our main customers are businesses with 50–500 employees..." rows={3} style={{ width: "100%", background: "#050d1a", border: `1px solid ${businessDescription.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box", resize: "vertical", lineHeight: 1.6 }} />
+            </div>
+          </div>
+          <button onClick={handlePrescreen} disabled={!name.trim() || !industry.trim() || !businessDescription.trim()} style={{ width: "100%", padding: "15px 24px", background: name.trim() && industry.trim() && businessDescription.trim() ? "#4a9eff" : "#0f1f35", border: `1px solid ${name.trim() && industry.trim() && businessDescription.trim() ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: name.trim() && industry.trim() && businessDescription.trim() ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: name.trim() && industry.trim() && businessDescription.trim() ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>
+            Start My Discovery →
+          </button>
+          <p style={{ textAlign: "center", color: "#1e293b", fontSize: 11, marginTop: 12, fontFamily: "Helvetica Neue, sans-serif" }}>Fields marked * are required</p>
+        </div>
       </div>
     </div>
   );
@@ -309,12 +359,11 @@ export default function Discovery() {
           </p>
         </div>
         <div style={{ background: "#0a1628", border: "1px solid #1e293b", borderRadius: 12, padding: 28 }}>
+          {name && <p style={{ color: "#475569", fontSize: 13, fontFamily: "Helvetica Neue, sans-serif", marginBottom: 16 }}>Generating map for <span style={{ color: "#f1f5f9" }}>{name}{company ? ` · ${company}` : ""}</span></p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name *" style={{ background: "#050d1a", border: `1px solid ${name.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif" }} />
-            <input value={company} onChange={e => setCompany(e.target.value)} placeholder="Company name" style={{ background: "#050d1a", border: "1px solid #1e293b", borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif" }} />
-            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address *" type="email" style={{ background: "#050d1a", border: `1px solid ${email.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif" }} />
+            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email address — where should we send your map? *" type="email" style={{ background: "#050d1a", border: `1px solid ${email.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif" }} />
           </div>
-          <button onClick={handleCapture} disabled={!name.trim() || !email.trim()} style={{ width: "100%", padding: "15px 24px", background: name.trim() && email.trim() ? "#4a9eff" : "#0f1f35", border: `1px solid ${name.trim() && email.trim() ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: name.trim() && email.trim() ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: name.trim() && email.trim() ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>
+          <button onClick={handleCapture} disabled={!email.trim()} style={{ width: "100%", padding: "15px 24px", background: email.trim() ? "#4a9eff" : "#0f1f35", border: `1px solid ${email.trim() ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: email.trim() ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: email.trim() ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif" }}>
             Generate My Opportunity Map →
           </button>
           <p style={{ textAlign: "center", color: "#1e293b", fontSize: 11, marginTop: 12, fontFamily: "Helvetica Neue, sans-serif" }}>Your details are used only to personalise and send your report</p>
