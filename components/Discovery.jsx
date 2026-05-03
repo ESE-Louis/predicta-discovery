@@ -586,9 +586,9 @@ export default function Discovery() {
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 24px 40px", position: "relative", zIndex: 2 }}>
         <div style={{ maxWidth: 640, width: "100%", opacity: transitioning ? 0 : 1, transform: transitioning ? "translateY(8px)" : "translateY(0)", transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
-            <span style={{ fontSize: 14, fontFamily: "Helvetica Neue, sans-serif", fontWeight: 600, background: `${currentMove.accent}15`, color: currentMove.accent, padding: "5px 14px", borderRadius: 4, letterSpacing: "0.04em" }}>Question {globalQ} of {totalQuestions}</span>
-            <span style={{ fontSize: 14, fontFamily: "Helvetica Neue, sans-serif", fontWeight: 600, color: currentMove.accent, letterSpacing: "0.04em" }}>· {currentMove.label}</span>
-            <span style={{ fontSize: 15, color: "#cbd5e1", fontFamily: "Helvetica Neue, sans-serif" }}>{currentMove.subtitle}</span>
+            <span style={{ fontSize: 16, fontFamily: "Helvetica Neue, sans-serif", fontWeight: 600, background: `${currentMove.accent}15`, color: currentMove.accent, padding: "5px 14px", borderRadius: 4, letterSpacing: "0.02em" }}>Question {globalQ} of {totalQuestions}</span>
+            <span style={{ fontSize: 16, fontFamily: "Helvetica Neue, sans-serif", fontWeight: 600, color: currentMove.accent, letterSpacing: "0.02em" }}>· {currentMove.label}</span>
+            <span style={{ fontSize: 16, fontFamily: "Helvetica Neue, sans-serif", fontWeight: 400, color: "#64748b", letterSpacing: "0.02em" }}>{currentMove.subtitle}</span>
             {currentQuestion?.text === null && resolvedTexts[currentQuestion?.id] && (
               <span style={{ fontSize: 9, color: "#4a9eff", fontFamily: "Helvetica Neue, sans-serif", background: "#4a9eff10", border: "1px solid #4a9eff20", padding: "2px 7px", borderRadius: 4, letterSpacing: "0.06em" }}>ADAPTED</span>
             )}
