@@ -199,10 +199,10 @@ export async function POST(request) {
       return Response.json({ error: error.message }, { status: 500 });
     }
 
-    // Send separate lead notification directly to Louis — never suppressed
+    // Send separate lead notification + full report copy to Louis — never suppressed
     if (process.env.LEAD_BCC_EMAIL) {
-      const notifyHtml = `
-        <div style="font-family:Helvetica,sans-serif;background:#050d1a;color:#f1f5f9;padding:32px;border-radius:12px;max-width:520px;">
+      const leadBanner = `
+        <div style="font-family:Helvetica,sans-serif;background:#050d1a;color:#f1f5f9;padding:32px;border-radius:12px;max-width:620px;margin-bottom:24px;">
           <p style="color:#4a9eff;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 12px;">New Lead — Predicta Discovery</p>
           <h2 style="margin:0 0 20px;font-size:24px;font-weight:400;font-family:Georgia,serif;">New discovery completed</h2>
           <table style="width:100%;border-collapse:collapse;">
@@ -210,8 +210,10 @@ export async function POST(request) {
             <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Company</td><td style="padding:8px 0;color:#f1f5f9;font-size:13px;">${company || "—"}</td></tr>
             <tr><td style="padding:8px 0;color:#64748b;font-size:13px;">Email</td><td style="padding:8px 0;font-size:13px;"><a href="mailto:${email}" style="color:#4a9eff;">${email}</a></td></tr>
           </table>
-          <p style="margin:20px 0 0;font-size:12px;color:#334155;">Their full report has been sent to their inbox. <a href="https://resend.com/emails" style="color:#4a9eff;">View in Resend →</a></p>
+          <p style="margin:20px 0 0;font-size:12px;color:#334155;border-top:1px solid #1e293b;padding-top:16px;">Full report copy below ↓</p>
         </div>`;
+
+      const notifyHtml = leadBanner + html;
 
       await resend.emails.send({
         from,
