@@ -68,11 +68,11 @@ async function fetchDynamicQuestion(questionKey, priorQA, businessContext) {
   return data.question;
 }
 
-async function fetchResults(answers, resolvedQuestions, name, company, industry, businessDescription, websiteContent) {
+async function fetchResults(answers, resolvedQuestions, name, company, industry, geography, businessDescription, websiteContent) {
   const res = await fetch("/api/generate-results", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ answers, resolvedQuestions, name, company, industry, businessDescription, websiteContent }),
+    body: JSON.stringify({ answers, resolvedQuestions, name, company, industry, geography, businessDescription, websiteContent }),
   });
   if (!res.ok) throw new Error(`Results API error ${res.status}`);
   return res.json();
@@ -154,6 +154,7 @@ export default function Discovery() {
   const [aiError, setAiError] = useState(null);
   const [resolvedTexts, setResolvedTexts] = useState({});
   const [industry, setIndustry] = useState("");
+  const [geography, setGeography] = useState("");
   const [businessDescription, setBusinessDescription] = useState("");
   const [website, setWebsite] = useState("");
   const [websiteContent, setWebsiteContent] = useState("");
@@ -236,7 +237,7 @@ export default function Discovery() {
   }
 
   async function handlePrescreen() {
-    if (!name.trim() || !industry.trim() || !businessDescription.trim()) return;
+    if (!name.trim() || !industry.trim() || !geography.trim() || !businessDescription.trim()) return;
 
     // If website entered, fetch content first — fail gracefully if it errors
     if (website.trim()) {
@@ -263,7 +264,7 @@ export default function Discovery() {
     if (!email.trim()) return;
     setPhase("loading");
     const flatResolved = MOVES.flatMap(m => m.questions).map(q => ({ ...q, resolvedText: resolvedTexts[q.id] || q.text }));
-    fetchResults(answers, flatResolved, name, company, industry, businessDescription, websiteContent)
+    fetchResults(answers, flatResolved, name, company, industry, geography, businessDescription, websiteContent)
       .then(r => { setAiResults(r); setPhase("results"); })
       .catch(e => { setAiError(e.message); setPhase("results"); });
   }
@@ -361,6 +362,10 @@ export default function Discovery() {
               <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="e.g. Professional Services, SaaS, Retail, Consulting, Finance..." style={{ width: "100%", background: "#050d1a", border: `1px solid ${industry.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box" }} />
             </div>
             <div>
+              <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>Geography *</label>
+              <input value={geography} onChange={e => setGeography(e.target.value)} placeholder="e.g. Australia, Southeast Asia, UK, Global..." style={{ width: "100%", background: "#050d1a", border: `1px solid ${geography.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box" }} />
+            </div>
+            <div>
               <label style={{ fontSize: 11, color: "#475569", fontFamily: "Helvetica Neue, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>What does your business do? *</label>
               <textarea value={businessDescription} onChange={e => setBusinessDescription(e.target.value)} placeholder="e.g. We provide HR software to mid-size companies in Australia, helping them manage payroll and compliance. Our main customers are businesses with 50–500 employees..." rows={3} style={{ width: "100%", background: "#050d1a", border: `1px solid ${businessDescription.trim() ? "#4a9eff40" : "#1e293b"}`, borderRadius: 8, padding: "13px 16px", color: "#f1f5f9", fontSize: 14, outline: "none", fontFamily: "Helvetica Neue, sans-serif", boxSizing: "border-box", resize: "vertical", lineHeight: 1.6 }} />
             </div>
@@ -372,7 +377,7 @@ export default function Discovery() {
               {website.trim() && <p style={{ margin: "6px 0 0", fontSize: 11, color: "#334155", fontFamily: "Helvetica Neue, sans-serif" }}>✦ We'll read your homepage to tailor every question to your business</p>}
             </div>
           </div>
-          <button onClick={handlePrescreen} disabled={!name.trim() || !industry.trim() || !businessDescription.trim() || fetchingWebsite} style={{ width: "100%", padding: "15px 24px", background: name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "#4a9eff" : "#0f1f35", border: `1px solid ${name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: name.trim() && industry.trim() && businessDescription.trim() && !fetchingWebsite ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <button onClick={handlePrescreen} disabled={!name.trim() || !industry.trim() || !geography.trim() || !businessDescription.trim() || fetchingWebsite} style={{ width: "100%", padding: "15px 24px", background: name.trim() && industry.trim() && geography.trim() && businessDescription.trim() && !fetchingWebsite ? "#4a9eff" : "#0f1f35", border: `1px solid ${name.trim() && industry.trim() && geography.trim() && businessDescription.trim() && !fetchingWebsite ? "#4a9eff" : "#1e293b"}`, borderRadius: 8, color: name.trim() && industry.trim() && geography.trim() && businessDescription.trim() && !fetchingWebsite ? "#050d1a" : "#334155", fontSize: 14, fontWeight: 700, cursor: name.trim() && industry.trim() && geography.trim() && businessDescription.trim() && !fetchingWebsite ? "pointer" : "default", letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Helvetica Neue, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
             {fetchingWebsite ? <><Spinner accent="#334155" size={16} /> Reading your website…</> : "Start My Discovery →"}
           </button>
           <p style={{ textAlign: "center", color: "#1e293b", fontSize: 11, marginTop: 12, fontFamily: "Helvetica Neue, sans-serif" }}>Fields marked * are required</p>
