@@ -317,16 +317,29 @@ Industry-Specific Metrics:
 // ─────────────────────────────────────────────────────────────
 // Match user's industry input to the closest benchmark category
 // ─────────────────────────────────────────────────────────────
+const BENCHMARK_LABELS = {
+  financial_services: "Financial Services & Wealth Management",
+  professional_services: "Professional Services",
+  saas: "SaaS & Software",
+  real_estate: "Real Estate & Property",
+  healthcare: "Healthcare & Allied Health",
+  retail: "Retail & eCommerce",
+  recruitment: "Recruitment & Talent",
+  media_marketing: "Marketing, Media & Advertising",
+  education: "Education & Training",
+  manufacturing: "Manufacturing & Supply Chain",
+};
+
 function getIndustryBenchmark(industryInput) {
-  if (!industryInput) return null;
+  if (!industryInput) return { data: null, label: null };
   const lower = industryInput.toLowerCase();
 
-  for (const [, benchmark] of Object.entries(INDUSTRY_BENCHMARKS)) {
+  for (const [key, benchmark] of Object.entries(INDUSTRY_BENCHMARKS)) {
     if (benchmark.keywords.some(kw => lower.includes(kw) || kw.includes(lower))) {
-      return benchmark.data;
+      return { data: benchmark.data, label: BENCHMARK_LABELS[key] };
     }
   }
-  return null;
+  return { data: null, label: null };
 }
 
 const BASE_SYSTEM_PROMPT = `You are an expert AI revenue strategist with deep knowledge of how AI is being applied across industries globally to generate new revenue. Analyse this self-serve discovery to identify where AI can generate NEW revenue — not reduce costs or headcount. The person completed this themselves.
@@ -372,7 +385,7 @@ export async function POST(request) {
       .join("\n\n");
 
     // Match industry to benchmark data
-    const industryBenchmark = getIndustryBenchmark(industry);
+    const { data: benchmarkData, label: benchmarkLabel } = getIndustryBenchmark(industry);
 
     const contextBlock = [
       `Name: ${name || "Unknown"}`,
@@ -381,7 +394,7 @@ export async function POST(request) {
       `Geography: ${geography || "Unknown"}`,
       `Business: ${businessDescription || "Unknown"}`,
       websiteContent ? `\nWebsite content (homepage extract):\n${websiteContent.slice(0, 3000)}` : null,
-      industryBenchmark ? `\n--- INDUSTRY BENCHMARK DATA ---\n${industryBenchmark}\n--- END BENCHMARK DATA ---` : null,
+      benchmarkData ? `\n--- INDUSTRY BENCHMARK DATA ---\n${benchmarkData}\n--- END BENCHMARK DATA ---` : null,
     ].filter(Boolean).join("\n");
 
     const message = await client.messages.create({
@@ -403,6 +416,8 @@ export async function POST(request) {
     if (start === -1 || end === -1) throw new Error("No JSON found in response");
 
     const results = JSON.parse(clean.slice(start, end + 1));
+    // Attach benchmark metadata so the frontend can display it
+    if (benchmarkLabel) results._benchmarkLabel = benchmarkLabel;
     return Response.json(results);
   } catch (error) {
     console.error("generate-results error:", error);

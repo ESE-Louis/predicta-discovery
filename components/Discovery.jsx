@@ -455,10 +455,22 @@ export default function Discovery() {
           <h2 style={{ fontSize: "clamp(24px,4vw,42px)", color: "#f1f5f9", fontWeight: 400, marginBottom: 4, letterSpacing: "-0.02em" }}>
             {company ? `${company}'s` : name ? `${name}'s` : "Your"} Opportunity Map
           </h2>
-          <p style={{ color: "#475569", fontSize: 13, marginBottom: 28, fontFamily: "Helvetica Neue, sans-serif" }}>
+          <p style={{ color: "#475569", fontSize: 13, marginBottom: 16, fontFamily: "Helvetica Neue, sans-serif" }}>
             {name}{name && company && " · "}{company}
             <span style={{ marginLeft: 10, color: "#1e293b" }}>· Personalised by Claude AI</span>
           </p>
+
+          {aiResults?._benchmarkLabel && (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(74,158,255,0.06)", border: "1px solid rgba(74,158,255,0.2)", borderRadius: 8, padding: "8px 14px", marginBottom: 24 }}>
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style={{ flexShrink: 0 }}>
+                <circle cx="6.5" cy="6.5" r="6" stroke="#4a9eff" strokeWidth="1"/>
+                <path d="M4 6.5l1.8 1.8L9 4.5" stroke="#4a9eff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: 11, fontFamily: "Helvetica Neue, sans-serif", color: "#4a9eff", letterSpacing: "0.04em" }}>
+                Benchmarked against <strong>{aiResults._benchmarkLabel}</strong> industry data
+              </span>
+            </div>
+          )}
 
           {aiError && <div style={{ background: "#1a0a0a", border: "1px solid #ef444430", borderRadius: 10, padding: 16, marginBottom: 24, color: "#ef4444", fontSize: 13, fontFamily: "Helvetica Neue, sans-serif" }}>⚠ {aiError}</div>}
 
