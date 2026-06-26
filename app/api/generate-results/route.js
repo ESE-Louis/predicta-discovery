@@ -406,10 +406,14 @@ export async function POST(request) {
           role: "user",
           content: `${contextBlock}\n\n${qaBlock}`,
         },
+        {
+          role: "assistant",
+          content: "{",
+        },
       ],
     });
 
-    const raw = message.content.map((b) => b.text || "").join("");
+    const raw = "{" + message.content.map((b) => b.text || "").join("");
     const clean = raw.replace(/```json|```/g, "").trim();
     const start = clean.indexOf("{");
     const end = clean.lastIndexOf("}");
