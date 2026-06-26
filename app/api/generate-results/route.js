@@ -410,7 +410,6 @@ export async function POST(request) {
     });
 
     const raw = message.content.map((b) => b.text || "").join("");
-    console.log("Raw Claude response (first 500 chars):", raw.slice(0, 500));
     const clean = raw.replace(/```json\n?|```\n?/g, "").trim();
     const start = clean.indexOf("{");
     const end = clean.lastIndexOf("}");
