@@ -404,23 +404,19 @@ export async function POST(request) {
       messages: [
         {
           role: "user",
-          content: `${contextBlock}\n\n${qaBlock}`,
-        },
-        {
-          role: "assistant",
-          content: "{",
+          content: `${contextBlock}\n\n${qaBlock}\n\nRespond with ONLY the JSON object. No text before or after it.`,
         },
       ],
     });
 
-    const raw = "{" + message.content.map((b) => b.text || "").join("");
-    const clean = raw.replace(/```json|```/g, "").trim();
+    const raw = message.content.map((b) => b.text || "").join("");
+    console.log("Raw Claude response (first 500 chars):", raw.slice(0, 500));
+    const clean = raw.replace(/```json\n?|```\n?/g, "").trim();
     const start = clean.indexOf("{");
     const end = clean.lastIndexOf("}");
     if (start === -1 || end === -1) throw new Error("No JSON found in response");
 
     const jsonStr = clean.slice(start, end + 1);
-    console.log("Raw Claude response (first 500 chars):", jsonStr.slice(0, 500));
     const results = JSON.parse(jsonStr);
     // Attach benchmark metadata so the frontend can display it
     if (benchmarkLabel) results._benchmarkLabel = benchmarkLabel;
