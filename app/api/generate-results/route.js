@@ -419,7 +419,9 @@ export async function POST(request) {
     const end = clean.lastIndexOf("}");
     if (start === -1 || end === -1) throw new Error("No JSON found in response");
 
-    const results = JSON.parse(clean.slice(start, end + 1));
+    const jsonStr = clean.slice(start, end + 1);
+    console.log("Raw Claude response (first 500 chars):", jsonStr.slice(0, 500));
+    const results = JSON.parse(jsonStr);
     // Attach benchmark metadata so the frontend can display it
     if (benchmarkLabel) results._benchmarkLabel = benchmarkLabel;
     return Response.json(results);
