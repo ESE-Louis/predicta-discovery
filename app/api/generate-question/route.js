@@ -53,7 +53,7 @@ export async function POST(request) {
     ].filter(Boolean).join("\n\n");
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 120,
       system: systemPrompt,
       messages: [{ role: "user", content: userContent }],
